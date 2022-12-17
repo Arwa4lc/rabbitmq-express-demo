@@ -47,43 +47,6 @@ async function connectQueue() {
           reasonOfFail,
         });
       }
-      // if (msg.fields.redelivered) {
-      //   channel.reject(msg, false);
-      // }
-
-      // return _sendMsgToRetry({
-      //   msg,
-      //   queue: "main-queue",
-      //   channel,
-      //   reasonOfFail: "Message was redelivered, so something wrong happened",
-      // });
-      // console.log("message ack1");
-      // channel.ack(msg);
-      // return (
-      //   new Promise((resolve, reject) => {
-      //
-
-      //     // resolve();
-      //     // reject("Something wrong with handler");
-      //     // throw new Error('Something wrong with handler');
-      //     return channel.reject(msg, false);
-      //   })
-      //     .then(() => {
-      //
-      //     })
-      //     // catch here allows us handle all the varieties of fails:
-      //     // - exceptions in handlers
-      //     // - rejects in handlers
-      //     // - redeliveries (server was down or something else)
-      //     .catch((reasonOfFail) => {
-      //       return _sendMsgToRetry({
-      //         msg,
-      //         queue: "main-queue",
-      //         channel,
-      //         reasonOfFail,
-      //       });
-      //     })
-      // );
     });
   } catch (error) {
     console.log(error);
@@ -112,8 +75,6 @@ function _sendMsgToRetry(args) {
       "🚀 ~ file: index.js:77 ~ getAttemptAndUpdatedContent ~ data.try_attempt",
       data.try_attempt
     );
-    // we don't rely on x-death, so write counter for sure
-    const attempt = data.try_attempt;
 
     data.content = Buffer.from(JSON.stringify(data.content), "utf8");
 
@@ -128,11 +89,6 @@ function _sendMsgToRetry(args) {
   );
 
   if (try_attempt <= attempts_total) {
-    // const ttlxName = _getTTLXName({ queue });
-    // console.log(
-    //   "🚀 ~ file: index.js:111 ~ _sendMsgToRetry ~ ttlxName",
-    //   ttlxName
-    // );
     const routingKey = _getTTLRoutingKey({ attempt: try_attempt });
     console.log(
       "🚀 ~ file: index.js:99 ~ _sendMsgToRetry ~ routingKey",
@@ -166,39 +122,3 @@ function _getTTLRoutingKey(options) {
 
 const PORT = process.env.PORT || 4002;
 app.listen(PORT, () => console.log("Server running at port " + PORT));
-
-// await channel.assertQueue("test-queue");
-
-// channel.consume("test-queue", (data) => {
-//   console.log(`${Buffer.from(data?.content)}`);
-//   channel.ack(data);
-// });
-// channel.consume(QUEUE_NAME, (m) => {
-//   const number = parseInt(m.content.toString());
-//   const square = number * number;
-//   console.log("---->square", square);
-//   channel.ack(m);
-// });
-
-// channel.consume(QUEUE_NAME2, (m) => {
-//   const number = parseInt(m.content.toString());
-//   const multiply = number * 2;
-//   console.log("---->multiplied by 2", multiply);
-//   channel.ack(m);
-// });
-
-// channel.consume("mainexchangequeue", (message) => {
-//   const number = parseInt(message.content.toString());
-//   console.log("🚀 ~ channel.consuming ");
-//   const multiply = number * 2;
-//   console.log("---->multiplied by 2", multiply);
-//   channel.nackAll();
-//   // channel.reject(message, false);
-// });
-
-// channel.consume("deadletterqueue", (message) => {
-//   const number = parseInt(message.content.toString());
-//   const square = number * number;
-//   console.log("---->square", square);
-//   channel.ack(message);
-// });
